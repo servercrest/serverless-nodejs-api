@@ -1,0 +1,42 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: servercrest
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: serverless-nodejs-api
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  environment:
+    DEBUG: ${env:DEBUG, 0}
+    DATABASE_URL: ${env:DATABASE_URL, "fallback value"}
+  iam:
+    role:
+      name: serverless-ssm-role-${env:STAGE, "prod"}
+      statements:
+        - Effect: "Allow"
+          Action: 
+            - "ssm:GetParameter"
+            - "ssm:GetParameters"
+            - "ssm:GetParametersByPath"
+            - "ssm:GetParameterHistory"
+            - "ssm:DescribeParameters"
+          Resource: "*"
+
+
+functions:
+  api:
+    handler: src/index.handler
+    events:
+      - httpApi: "*"
+
+custom:
+  dotenv:
+    exclude:
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+      - DATABASE_URL
+
+plugins:
+  - serverless-offline
