@@ -8,5 +8,5 @@ const leadTable = pgTable('leads', {
 });
 
 module.exports = {
-    leadTable
+    LeadTable
 };
